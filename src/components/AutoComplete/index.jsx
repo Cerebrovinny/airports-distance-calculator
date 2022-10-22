@@ -3,12 +3,13 @@ import { useState, useEffect} from "react";
 import { queryMatch, airportString, manageScrollView } from '../../utils.js';
 import Results from '../Results';
 import "./styles.css";
+import Map from '../Map';
 
-function Autocomplete({label, setPoint, clearPoint}) {
+function Autocomplete({ label }) {
     const [value, setValue] = useState("");
     const [suggestion, setSuggestion] = useState("");
     const [results, setResults] = useState([]);
-    const [selected, setSelected] = useState(null);
+    const [selected, setSelected] = useState({});
     const [input, setInput] = useState(null);
 
     useEffect(() => {
@@ -44,9 +45,6 @@ function Autocomplete({label, setPoint, clearPoint}) {
         setSuggestion(e.target.value);
         setResults(queryMatch(e.target.value));
         setSelected(null);
-        if (!results[0]) {
-        clearPoint(label);
-        }
     }
 
     function handleDown(index) {
@@ -97,12 +95,12 @@ function Autocomplete({label, setPoint, clearPoint}) {
     function confirm(airport) {
         setSuggestion(airportString(airport));
         setResults([]);
-        setPoint(label, JSON.stringify({
+        setSelected(JSON.stringify({
         lat: airport.lat,
         lng: airport.lng,
         name: airport.name
         }));
-        }
+    }
 
     function updateSuggestion(e) {
         const key = e.keyCode;
@@ -130,13 +128,15 @@ function Autocomplete({label, setPoint, clearPoint}) {
         const item = e.currentTarget;
         const coords = JSON.parse(item.dataset.coords);
         setSuggestion(item.innerHTML);
-        setResults([]);
-        setPoint(label, JSON.stringify({
+        setSelected(label + " " + JSON.stringify({
         lat: coords.lat,
         lng: coords.lng,
         name: item.dataset.name
         }));
+        setResults([]);
     }
+
+
 
     function clearResults(e) {
         setResults([]);
@@ -165,6 +165,7 @@ function Autocomplete({label, setPoint, clearPoint}) {
     //     }
     // }
 
+    console.log(selected, 'selected')
     return (
         <div className="autocomplete">
             <label>{ label }</label>
@@ -183,6 +184,7 @@ function Autocomplete({label, setPoint, clearPoint}) {
                 selected={ selected }
             />
             }
+            <Map />
         </div>
 
     );
